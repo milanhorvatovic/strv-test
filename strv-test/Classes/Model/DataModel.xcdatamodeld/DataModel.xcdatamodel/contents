@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="7549" systemVersion="14D136" minimumToolsVersion="Xcode 4.3" macOSVersion="Automatic" iOSVersion="Automatic">
+    <entity name="City" representedClassName="CDCity" syncable="YES">
+        <attribute name="country" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="identifier" optional="YES" attributeType="Integer 64" defaultValueString="0" syncable="YES"/>
+        <attribute name="locationLatitude" optional="YES" attributeType="Double" defaultValueString="0.0" syncable="YES"/>
+        <attribute name="locationLongitude" optional="YES" attributeType="Double" defaultValueString="0.0" syncable="YES"/>
+        <attribute name="name" attributeType="String" syncable="YES"/>
+        <attribute name="search" attributeType="String" indexed="YES" syncable="YES"/>
+        <relationship name="forecasts" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Forecast" inverseName="city" inverseEntity="Forecast" syncable="YES"/>
+        <relationship name="list" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="List" inverseName="city" inverseEntity="List" syncable="YES"/>
+    </entity>
+    <entity name="Forecast" representedClassName="CDForecast" syncable="YES">
+        <attribute name="date" optional="YES" attributeType="Date" syncable="YES"/>
+        <attribute name="humidity" optional="YES" attributeType="Double" defaultValueString="0.0" syncable="YES"/>
+        <attribute name="precipitation" optional="YES" attributeType="Double" defaultValueString="0.0" syncable="YES"/>
+        <attribute name="pressure" optional="YES" attributeType="Double" defaultValueString="0.0" syncable="YES"/>
+        <attribute name="temperature" optional="YES" attributeType="Double" defaultValueString="0.0" syncable="YES"/>
+        <attribute name="weatherDescription" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="weatherId" optional="YES" attributeType="Integer 64" defaultValueString="0" syncable="YES"/>
+        <attribute name="weatherState" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="windDirection" optional="YES" attributeType="Double" defaultValueString="0.0" syncable="YES"/>
+        <attribute name="windSpeed" optional="YES" attributeType="Double" defaultValueString="0.0" syncable="YES"/>
+        <relationship name="city" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="City" inverseName="forecasts" inverseEntity="City" syncable="YES"/>
+    </entity>
+    <entity name="List" representedClassName="CDList" syncable="YES">
+        <attribute name="located" attributeType="Boolean" defaultValueString="NO" syncable="YES"/>
+        <attribute name="selected" attributeType="Boolean" defaultValueString="NO" syncable="YES"/>
+        <relationship name="city" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="City" inverseName="list" inverseEntity="City" syncable="YES"/>
+    </entity>
+    <elements>
+        <element name="City" positionX="-36" positionY="9" width="128" height="163"/>
+        <element name="Forecast" positionX="216" positionY="15" width="128" height="208"/>
+        <element name="List" positionX="90" positionY="225" width="128" height="88"/>
+    </elements>
+</model>
