@@ -33,13 +33,11 @@
 		3E63B6A01AF55A2400F5FE3B /* CDForecast_STRV.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E63B69F1AF55A2400F5FE3B /* CDForecast_STRV.swift */; };
 		3E63B6AA1AF5686500F5FE3B /* CDCity_STRV.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E63B6A91AF5686400F5FE3B /* CDCity_STRV.swift */; };
 		3E63B6AC1AF569A800F5FE3B /* CDList_STRV.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E63B6AB1AF569A800F5FE3B /* CDList_STRV.swift */; };
-		3E63B6AE1AF5777A00F5FE3B /* CDForecast.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E63B6AD1AF5777A00F5FE3B /* CDForecast.swift */; };
 		3E63B6B61AF57DEA00F5FE3B /* ForecastTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E63B6B51AF57DEA00F5FE3B /* ForecastTableViewCell.swift */; };
 		3E63B6B81AF57DFE00F5FE3B /* ForecastViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E63B6B71AF57DFE00F5FE3B /* ForecastViewController.swift */; };
-		3E63B6BE1AF5F2B500F5FE3B /* datastorage_V1.sqlite in Resources */ = {isa = PBXBuildFile; fileRef = 3E63B6BB1AF5F2B500F5FE3B /* datastorage_V1.sqlite */; };
-		3E63B6BF1AF5F2B500F5FE3B /* datastorage_V1.sqlite-shm in Resources */ = {isa = PBXBuildFile; fileRef = 3E63B6BC1AF5F2B500F5FE3B /* datastorage_V1.sqlite-shm */; };
-		3E63B6C01AF5F2B500F5FE3B /* datastorage_V1.sqlite-wal in Resources */ = {isa = PBXBuildFile; fileRef = 3E63B6BD1AF5F2B500F5FE3B /* datastorage_V1.sqlite-wal */; };
 		3E63B6C21AF60C1600F5FE3B /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E63B6C11AF60C1600F5FE3B /* SettingsViewController.swift */; };
+		3E63B6C61AF924A500F5FE3B /* CDForecast.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E63B6C51AF924A500F5FE3B /* CDForecast.swift */; };
+		3E63B6C81AF9448300F5FE3B /* SettingsTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E63B6C71AF9448300F5FE3B /* SettingsTableViewCell.swift */; };
 		CF6E763AAC65DC3ADC339057 /* Pods.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ABF68804F64B57C015F24FDF /* Pods.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 /* End PBXBuildFile section */
 
@@ -86,13 +84,11 @@
 		3E63B69F1AF55A2400F5FE3B /* CDForecast_STRV.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CDForecast_STRV.swift; sourceTree = "<group>"; };
 		3E63B6A91AF5686400F5FE3B /* CDCity_STRV.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CDCity_STRV.swift; sourceTree = "<group>"; };
 		3E63B6AB1AF569A800F5FE3B /* CDList_STRV.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CDList_STRV.swift; sourceTree = "<group>"; };
-		3E63B6AD1AF5777A00F5FE3B /* CDForecast.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CDForecast.swift; sourceTree = "<group>"; };
 		3E63B6B51AF57DEA00F5FE3B /* ForecastTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ForecastTableViewCell.swift; sourceTree = "<group>"; };
 		3E63B6B71AF57DFE00F5FE3B /* ForecastViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ForecastViewController.swift; sourceTree = "<group>"; };
-		3E63B6BB1AF5F2B500F5FE3B /* datastorage_V1.sqlite */ = {isa = PBXFileReference; lastKnownFileType = file; path = datastorage_V1.sqlite; sourceTree = "<group>"; };
-		3E63B6BC1AF5F2B500F5FE3B /* datastorage_V1.sqlite-shm */ = {isa = PBXFileReference; lastKnownFileType = file; path = "datastorage_V1.sqlite-shm"; sourceTree = "<group>"; };
-		3E63B6BD1AF5F2B500F5FE3B /* datastorage_V1.sqlite-wal */ = {isa = PBXFileReference; lastKnownFileType = file; path = "datastorage_V1.sqlite-wal"; sourceTree = "<group>"; };
 		3E63B6C11AF60C1600F5FE3B /* SettingsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsViewController.swift; sourceTree = "<group>"; };
+		3E63B6C51AF924A500F5FE3B /* CDForecast.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CDForecast.swift; sourceTree = "<group>"; };
+		3E63B6C71AF9448300F5FE3B /* SettingsTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsTableViewCell.swift; sourceTree = "<group>"; };
 		A485F1276D609797645719DF /* Pods.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.debug.xcconfig; path = "Pods/Target Support Files/Pods/Pods.debug.xcconfig"; sourceTree = "<group>"; };
 		ABF68804F64B57C015F24FDF /* Pods.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		B4F5E922A35D1A826AF96007 /* Pods.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.release.xcconfig; path = "Pods/Target Support Files/Pods/Pods.release.xcconfig"; sourceTree = "<group>"; };
@@ -210,7 +206,7 @@
 				3E63B69F1AF55A2400F5FE3B /* CDForecast_STRV.swift */,
 				3E63B6A91AF5686400F5FE3B /* CDCity_STRV.swift */,
 				3E63B6AB1AF569A800F5FE3B /* CDList_STRV.swift */,
-				3E63B6AD1AF5777A00F5FE3B /* CDForecast.swift */,
+				3E63B6C51AF924A500F5FE3B /* CDForecast.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -220,6 +216,7 @@
 			children = (
 				3E63B6941AF53CD000F5FE3B /* LocationTableViewCell.swift */,
 				3E63B6B51AF57DEA00F5FE3B /* ForecastTableViewCell.swift */,
+				3E63B6C71AF9448300F5FE3B /* SettingsTableViewCell.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -230,7 +227,6 @@
 				3E63B67B1AF36C9D00F5FE3B /* city-list.json */,
 				3E63B5FB1AF0A92600F5FE3B /* Fonts */,
 				3E63B5FA1AF096F700F5FE3B /* String */,
-				3E63B6891AF524DF00F5FE3B /* Database */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -280,16 +276,6 @@
 				3E63B6751AF367AD00F5FE3B /* SwiftTryCatch.m */,
 			);
 			path = SwiftTryCatch;
-			sourceTree = "<group>";
-		};
-		3E63B6891AF524DF00F5FE3B /* Database */ = {
-			isa = PBXGroup;
-			children = (
-				3E63B6BB1AF5F2B500F5FE3B /* datastorage_V1.sqlite */,
-				3E63B6BC1AF5F2B500F5FE3B /* datastorage_V1.sqlite-shm */,
-				3E63B6BD1AF5F2B500F5FE3B /* datastorage_V1.sqlite-wal */,
-			);
-			path = Database;
 			sourceTree = "<group>";
 		};
 		79F3D72E5EE47932F2D5A5E3 /* Frameworks */ = {
@@ -398,10 +384,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3E63B6BF1AF5F2B500F5FE3B /* datastorage_V1.sqlite-shm in Resources */,
-				3E63B6BE1AF5F2B500F5FE3B /* datastorage_V1.sqlite in Resources */,
 				3E63B6021AF0A92600F5FE3B /* ProximaNova-Light.otf in Resources */,
-				3E63B6C01AF5F2B500F5FE3B /* datastorage_V1.sqlite-wal in Resources */,
 				3E63B5D71AF08CF300F5FE3B /* Main.storyboard in Resources */,
 				3E63B6761AF367AD00F5FE3B /* LICENSE in Resources */,
 				3E63B6011AF0A92600F5FE3B /* ProximaNova-Bold.otf in Resources */,
@@ -478,6 +461,7 @@
 				3E63B6171AF1FF7500F5FE3B /* LoaderManager.swift in Sources */,
 				3E63B6801AF4A8DC00F5FE3B /* CDCity.swift in Sources */,
 				3E63B6771AF367AD00F5FE3B /* README.md in Sources */,
+				3E63B6C61AF924A500F5FE3B /* CDForecast.swift in Sources */,
 				3E63B61B1AF2042400F5FE3B /* LocationManager.swift in Sources */,
 				3E63B6681AF34DBB00F5FE3B /* DataModel.xcdatamodeld in Sources */,
 				3E63B6C21AF60C1600F5FE3B /* SettingsViewController.swift in Sources */,
@@ -491,8 +475,8 @@
 				3E63B5D01AF08CF300F5FE3B /* AppDelegate.swift in Sources */,
 				3E63B5F71AF0969600F5FE3B /* TodayViewController.swift in Sources */,
 				3E63B6911AF5348F00F5FE3B /* CDList.swift in Sources */,
-				3E63B6AE1AF5777A00F5FE3B /* CDForecast.swift in Sources */,
 				3E63B6701AF3536800F5FE3B /* DatabaseManager.swift in Sources */,
+				3E63B6C81AF9448300F5FE3B /* SettingsTableViewCell.swift in Sources */,
 				3E63B6B81AF57DFE00F5FE3B /* ForecastViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

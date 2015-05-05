@@ -14,6 +14,8 @@ class LocationViewController: UIViewController, UITableViewDelegate, UITableView
     @IBOutlet weak private var tableView: UITableView?;
     @IBOutlet weak private var addButton: UIButton?;
     
+    var cities: [AnyObject]?;
+    
     lazy var searchController: UISearchController = {
         let controller = UISearchController(searchResultsController: nil);
         controller.searchResultsUpdater = self;
@@ -22,7 +24,6 @@ class LocationViewController: UIViewController, UITableViewDelegate, UITableView
         controller.searchBar.sizeToFit();
         controller.searchBar.barTintColor = UIColor.whiteColor();
         controller.searchBar.backgroundColor = UIColor.clearColor();
-//        controller.searchBar.text
         controller.searchBar.tintColor = UIColor(red: 47.0 / 255.0, green: 145.0 / 255.0, blue: 255.0 / 255.0, alpha: 1.0);
         controller.searchBar.setImage(UIImage(named: "Search"), forSearchBarIcon: UISearchBarIcon.Search, state: UIControlState.Normal);
         controller.searchBar.setImage(UIImage(named: "Close"), forSearchBarIcon: UISearchBarIcon.Clear, state: UIControlState.Normal);
@@ -59,22 +60,6 @@ class LocationViewController: UIViewController, UITableViewDelegate, UITableView
         
         return frc
     }()
-    lazy var searchFetchedResultsController: NSFetchedResultsController = {
-        let fetchRequest = NSFetchRequest(entityName: "City");
-        
-        let primarySortDescriptor = NSSortDescriptor(key: "name", ascending: true);
-        fetchRequest.sortDescriptors = [primarySortDescriptor];
-        
-        let frc = NSFetchedResultsController(
-            fetchRequest: fetchRequest,
-            managedObjectContext: DatabaseManager.sharedInstance.mainObjectContext!,
-            sectionNameKeyPath: nil,
-            cacheName: nil)
-        
-        frc.delegate = self
-        
-        return frc
-    }()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -90,9 +75,6 @@ class LocationViewController: UIViewController, UITableViewDelegate, UITableView
         if (self.fetchedResultsController.performFetch(&error) == false) {
             print("An error occurred: \(error?.localizedDescription)");
         }
-        if (self.searchFetchedResultsController.performFetch(&error) == false) {
-            print("An error occurred: \(error?.localizedDescription)");
-        }
         self.tableView?.reloadData();
     }
     
@@ -105,10 +87,9 @@ class LocationViewController: UIViewController, UITableViewDelegate, UITableView
                 if let fetchedObjects = self.fetchedResultsController.fetchedObjects {
                     for item in fetchedObjects {
                         if let list: CDList = item as? CDList {
-                            LoaderManager.sharedInstance.loadCurrentWeatherWithPosition(list.city.locationLatitude.doubleValue, longitude: list.city.locationLongitude.doubleValue, successHandler: { (request, response, success) -> Void in
-                                
-                            }, failuerHandler: { (error) -> Void in
-                                println("Error \(error)");
+                            LoaderManager.sharedInstance.loadCurrentWeatherWithId(list.city.identifier.integerValue, successHandler: { (request, response, success) -> Void in
+                                }, failuerHandler: { (error) -> Void in
+                                    println("Error \(error)");
                             });
                         }
                     }
@@ -127,9 +108,12 @@ class LocationViewController: UIViewController, UITableViewDelegate, UITableView
     //  MARK: Table view data source
     func numberOfSectionsInTableView(tableView: UITableView) -> Int {
         if (self.searchController.active) {
+            return 1;
+            /*
             if let sections = self.searchFetchedResultsController.sections {
                 return sections.count;
             }
+            */
         }
         else {
             if let sections = self.fetchedResultsController.sections {
@@ -142,10 +126,18 @@ class LocationViewController: UIViewController, UITableViewDelegate, UITableView
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if (self.searchController.active) {
+            if let cities = self.cities {
+                return count(cities);
+            }
+            else {
+                return 0;
+            }
+            /*
             if let sections = self.searchFetchedResultsController.sections {
                 let currentSection = sections[section] as! NSFetchedResultsSectionInfo
                 return currentSection.numberOfObjects
             }
+            */
         }
         else {
             if let sections = self.fetchedResultsController.sections {
@@ -244,38 +236,53 @@ class LocationViewController: UIViewController, UITableViewDelegate, UITableView
     }
     
     func didPresentSearchController(searchController: UISearchController) {
+        self.addButton?.alpha = 0.0;
         self.tableView?.reloadData();
     }
     
     func willDismissSearchController(searchController: UISearchController) {
+        self.addButton?.alpha = 1.0;
 //        self.tableView?.reloadData();
         self.tableView?.separatorStyle = UITableViewCellSeparatorStyle.None;
     }
     
     func didDismissSearchController(searchController: UISearchController) {
         self.tableView?.reloadData();
+        self.cities = nil;
     }
     
     //  MARK: UISearchResultsUpdating
     func updateSearchResultsForSearchController(searchController: UISearchController) {
-        let fetchRequest: NSFetchRequest = self.searchFetchedResultsController.fetchRequest;
-        var predicate: NSPredicate? = nil;
         if (searchController.searchBar.text.isEmpty) {
-            
+            self.cities = nil;
         }
         else {
-            var normalized = NSMutableString(string: searchController.searchBar.text) as CFMutableString;
-            CFStringNormalize(normalized, CFStringNormalizationForm.D);
-            CFStringFold(normalized, CFStringCompareFlags.CompareCaseInsensitive | CFStringCompareFlags.CompareDiacriticInsensitive | CFStringCompareFlags.CompareWidthInsensitive, nil);
-            let search: String = normalized as String;
-            predicate = NSPredicate(format: "search BEGINSWITH %@", search);
+            LoaderManager.sharedInstance.findCityWithName(searchController.searchBar.text, successHandler: {
+                (request, response, success) -> Void in
+                
+                if let successResponse: NSDictionary = success {
+                    if let forecastArray: NSArray = successResponse["list"] as? NSArray {
+                        if (forecastArray.count > 0) {
+                            self.cities = forecastArray as [AnyObject];
+                            
+                            self.tableView?.reloadData();
+                        }
+                        else {
+                            self.cities = nil;
+                        }
+                    }
+                    else {
+                        self.cities = nil;
+                    }
+                }
+                else {
+                    self.cities = nil;
+                }
+                
+                }) { (error) -> Void in
+                    println("Error \(error)");
+            };
         }
-        fetchRequest.predicate = predicate;
-        var error: NSError? = nil
-        if (self.searchFetchedResultsController.performFetch(&error) == false) {
-            print("An error occurred: \(error?.localizedDescription)");
-        }
-        self.tableView?.reloadData();
     }
 
     //  MARK: NSFetchedResultsControllerDelegate
@@ -339,27 +346,65 @@ class LocationViewController: UIViewController, UITableViewDelegate, UITableView
     
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         if (self.searchController.active) {
-            if let city: CDCity = self.searchFetchedResultsController.objectAtIndexPath(indexPath) as? CDCity {
-                var list: CDList? = city.list;
-                if (list == nil) {
-                    let context: NSManagedObjectContext = DatabaseManager.sharedInstance.createDatabaseContext()!;
+            if let cityJSON: NSDictionary = self.cities?[indexPath.row] as? NSDictionary {
+                tableView.deselectRowAtIndexPath(indexPath, animated: true);
+                self.searchController.active = false;
+                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, Int64(0.5 * Double(NSEC_PER_SEC))), dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)) {
+                    let cityId: NSNumber? = cityJSON["id"] as? NSNumber;
+                    let cityName: String? = cityJSON["name"] as? String;
                     
-                    list = NSEntityDescription.insertNewObjectForEntityForName("List", inManagedObjectContext: context) as? CDList;
-                    list?.city = context.objectWithID(city.objectID) as! CDCity;
-                    
-                    DatabaseManager.sharedInstance.saveDatabaseContext(context);
-                }
-                
-                if (list != nil) {
-                    LoaderManager.sharedInstance.loadCurrentWeatherWithPosition(list!.city.locationLatitude.doubleValue, longitude: list!.city.locationLongitude.doubleValue, successHandler: { (request, response, success) -> Void in
-
-                    }, failuerHandler: { (error) -> Void in
-                        println("Error \(error)");
-                    });
+                    if (cityId != nil && cityName != nil) {
+                        var city: CDCity?;
+                        
+                        if let context: NSManagedObjectContext? = DatabaseManager.sharedInstance.createDatabaseContext() {
+                            var fetchRequest: NSFetchRequest = NSFetchRequest(entityName: "City");
+                            let cityPredicate: NSPredicate = NSPredicate(format: "identifier = %@", cityId!);
+                            fetchRequest.predicate = cityPredicate;
+                            var error: NSError?;
+                            if let cityArray = context?.executeFetchRequest(fetchRequest, error: &error) {
+                                if (cityArray.count > 0) {
+                                    city = cityArray.first as? CDCity;
+                                }
+                                
+                                if (city == nil) {
+                                    city = NSEntityDescription.insertNewObjectForEntityForName("City", inManagedObjectContext: context!) as? CDCity;
+                                }
+                            }
+                            
+                            if (city != nil) {
+                                city?.identifier = cityId!;
+                                if let cityName: String = cityName {
+                                    city?.name = cityName;
+                                }
+                                if let coordinates: NSDictionary = cityJSON["coord"] as? NSDictionary {
+                                    if let latitude: NSNumber = coordinates["lat"] as? NSNumber {
+                                        city?.locationLatitude = latitude;
+                                    }
+                                    if let longitude: NSNumber = coordinates["lon"] as? NSNumber {
+                                        city?.locationLongitude = longitude;
+                                    }
+                                }
+                                if let country: String = cityJSON["sys"]?["country"] as? String {
+                                    city?.country = country;
+                                }
+                                
+                                var list: CDList? = city!.list;
+                                if (list == nil) {
+                                    list = NSEntityDescription.insertNewObjectForEntityForName("List", inManagedObjectContext: context!) as? CDList;
+                                    list?.city = city!;
+                                }
+                            }
+                            
+                            DatabaseManager.sharedInstance.saveDatabaseContext(context!);
+                            
+                            LoaderManager.sharedInstance.loadCurrentWeatherWithId(city!.identifier.integerValue, successHandler: { (request, response, success) -> Void in
+                                }, failuerHandler: { (error) -> Void in
+                                    println("Error \(error)");
+                            });
+                        }
+                    }
                 }
             }
-            tableView.deselectRowAtIndexPath(indexPath, animated: true);
-            self.searchController.active = false;
         }
         else {
             tableView.deselectRowAtIndexPath(indexPath, animated: true);
@@ -369,13 +414,25 @@ class LocationViewController: UIViewController, UITableViewDelegate, UITableView
     //  MARK: Private
     func configureCell(cell: UITableViewCell, atIndexPath indexPath: NSIndexPath) {
         if (self.searchController.active) {
-            if let city: CDCity = self.searchFetchedResultsController.objectAtIndexPath(indexPath) as? CDCity {
-                let value: NSString = NSString(format: "%@, %@", city.name, city.country);
-                var attributedString: NSMutableAttributedString = NSMutableAttributedString(string: value as String);
-                attributedString.addAttribute(NSForegroundColorAttributeName, value: UIColor(red: 51.0 / 255.0, green: 51.0 / 255.0, blue: 51.0 / 255.0, alpha: 1.0), range: NSMakeRange(0, value.length));
-                attributedString.addAttribute(NSFontAttributeName, value: UIFont(name: "ProximaNova-Semibold", size: 16)!, range: value.rangeOfString(city.name));
-                attributedString.addAttribute(NSFontAttributeName, value: UIFont(name: "ProximaNova-Light", size: 16)!, range: value.rangeOfString(city.country));
-                cell.textLabel?.attributedText = attributedString;
+//            {"id":2643743,"name":"London","coord":{"lon":-0.12574,"lat":51.50853},"main":{"temp":284.039,"temp_min":284.039,"temp_max":284.039,"pressure":1005.43,"sea_level":1013.25,"grnd_level":1005.43,"humidity":86},"dt":1430852274,"wind":{"speed":7.71,"deg":217.002},"sys":{"country":"GB"},"clouds":{"all":68},"weather":[{"id":803,"main":"Clouds","description":"broken clouds","icon":"04d"}]}
+            if let city: NSDictionary = self.cities?[indexPath.row] as? NSDictionary {
+                if let cityName: String = city["name"] as? String {
+                    if let cityCountry: String = city["sys"]?["country"] as? String {
+                        let value: NSString = cityName + ", " + cityCountry;
+                        var attributedString: NSMutableAttributedString = NSMutableAttributedString(string: value as String);
+                        attributedString.addAttribute(NSForegroundColorAttributeName, value: UIColor(red: 51.0 / 255.0, green: 51.0 / 255.0, blue: 51.0 / 255.0, alpha: 1.0), range: NSMakeRange(0, value.length));
+                        attributedString.addAttribute(NSFontAttributeName, value: UIFont(name: "ProximaNova-Semibold", size: 16)!, range: value.rangeOfString(cityName));
+                        attributedString.addAttribute(NSFontAttributeName, value: UIFont(name: "ProximaNova-Light", size: 16)!, range: value.rangeOfString(cityCountry));
+                        cell.textLabel?.attributedText = attributedString;
+                    }
+                    else {
+                        let value: NSString = cityName;
+                        var attributedString: NSMutableAttributedString = NSMutableAttributedString(string: value as String);
+                        attributedString.addAttribute(NSForegroundColorAttributeName, value: UIColor(red: 51.0 / 255.0, green: 51.0 / 255.0, blue: 51.0 / 255.0, alpha: 1.0), range: NSMakeRange(0, value.length));
+                        attributedString.addAttribute(NSFontAttributeName, value: UIFont(name: "ProximaNova-Semibold", size: 16)!, range: value.rangeOfString(cityName));
+                        cell.textLabel?.attributedText = attributedString;
+                    }
+                }
             }
         }
         else {
@@ -387,20 +444,15 @@ class LocationViewController: UIViewController, UITableViewDelegate, UITableView
                 if (city != nil) {
                     cell.nameLabel?.text = city!.name;
                     
-                    
-                    let currentDate: NSDate = NSDate();
-                    let dateFrom: NSDate = NSDate(timeIntervalSince1970: currentDate.timeIntervalSince1970 - (currentDate.timeIntervalSince1970 % 86400) - 1);
-                    let dateTo: NSDate = NSDate(timeIntervalSince1970: currentDate.timeIntervalSince1970 - (currentDate.timeIntervalSince1970 % 86400) + 86400);
-                    let dateFromPredicate: NSPredicate = NSPredicate(format: "date > %@", dateFrom);
-                    let dateToPredicate: NSPredicate = NSPredicate(format: "date < %@", dateTo);
-                    let compoundPredicate: NSPredicate = NSCompoundPredicate.andPredicateWithSubpredicates([dateFromPredicate, dateToPredicate]);
-                    
-                    let forecasts = city?.forecasts.filteredSetUsingPredicate(compoundPredicate);
+                    let currentPredicate: NSPredicate = NSPredicate(format: "current = %@", NSNumber(bool: true));
+                    let forecasts = city?.forecasts.filteredSetUsingPredicate(currentPredicate);
                     if let forecast: CDForecast = forecasts!.first as? CDForecast {
                         if let weatherImage = forecast.weatherStateImageName() {
                             cell.weatherImageView?.image = UIImage(named: weatherImage);
                         }
-                        cell.temperatureLabel?.text = String(format: "%.1f °", forecast.temperature.doubleValue - 273.15);
+                        if let temperature: String = forecast.temperatureString(1) {
+                            cell.temperatureLabel?.text = temperature;
+                        }
                         cell.weatherConditionLabel?.text = forecast.weatherState;
                     }
                 }

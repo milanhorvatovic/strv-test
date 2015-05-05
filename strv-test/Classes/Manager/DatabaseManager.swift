@@ -135,43 +135,6 @@ class DatabaseManager: NSObject {
         
         if let storeURL = NSURL.fileURLWithPath(path.stringByAppendingPathComponent("datastorage_V1.sqlite")) {
             
-            if (fileManager.fileExistsAtPath(storeURL.path!) == false) {
-                var error: NSError?;
-                
-                if let sqliteSource: String = NSBundle.mainBundle().pathForResource("datastorage_V1", ofType: "sqlite") {
-                    let sqliteDestination: String = path.stringByAppendingPathComponent("datastorage_V1.sqlite");
-                    if (fileManager.copyItemAtPath(sqliteSource, toPath: sqliteDestination, error: &error) == false) {
-                        println("Failed to copy sqlite");
-                        if (error != nil) {
-                            println("\tError \(error!.userInfo)");
-                            abort();
-                        }
-                    }
-                }
-                
-                if let shmSource: String = NSBundle.mainBundle().pathForResource("datastorage_V1", ofType: "sqlite-shm") {
-                    let shmDestination: String! = path.stringByAppendingPathComponent("datastorage_V1.sqlite-shm");
-                    if (fileManager.copyItemAtPath(shmSource, toPath: shmDestination, error: &error) == false) {
-                        println("Failed to copy sqlite-shm");
-                        if (error != nil) {
-                            println("\tError \(error!.userInfo)");
-                            abort();
-                        }
-                    }
-                }
-                
-                if let walSource: String = NSBundle.mainBundle().pathForResource("datastorage_V1", ofType: "sqlite-wal") {
-                    let walDestination: String! = path.stringByAppendingPathComponent("datastorage_V1.sqlite-wal");
-                    if (fileManager.copyItemAtPath(walSource, toPath: walDestination, error: &error) == false) {
-                        println("Failed to copy sqlite-wal");
-                        if (error != nil) {
-                            println("\tError \(error!.userInfo)");
-                            abort();
-                        }
-                    }
-                }
-            }
-            
             let options:[NSObject: AnyObject] = [NSMigratePersistentStoresAutomaticallyOption: NSNumber(bool: true), NSInferMappingModelAutomaticallyOption: NSNumber(bool: true)];
             
             var error: NSError?;

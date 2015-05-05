@@ -31,6 +31,7 @@
             <string>ProximaNova-Semibold</string>
             <string>ProximaNova-Semibold</string>
             <string>ProximaNova-Semibold</string>
+            <string>ProximaNova-Semibold</string>
         </mutableArray>
     </customFonts>
     <scenes>
@@ -370,76 +371,110 @@
         <!--Settings-->
         <scene sceneID="fYB-a5-A55">
             <objects>
-                <tableViewController id="dvu-X3-GKw" sceneMemberID="viewController">
-                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="static" style="grouped" separatorStyle="default" allowsSelection="NO" rowHeight="44" sectionHeaderHeight="10" sectionFooterHeight="10" id="JjX-LK-2Gs">
+                <tableViewController id="dvu-X3-GKw" customClass="SettingsViewController" customModule="strv_test" customModuleProvider="target" sceneMemberID="viewController">
+                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="grouped" separatorStyle="default" rowHeight="44" sectionHeaderHeight="10" sectionFooterHeight="10" id="JjX-LK-2Gs">
                         <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
-                        <sections>
-                            <tableViewSection headerTitle="GENERALS" id="2La-bf-txs">
-                                <cells>
-                                    <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" id="4m9-JX-vjI">
-                                        <autoresizingMask key="autoresizingMask"/>
-                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="4m9-JX-vjI" id="AdW-Wh-cdg">
-                                            <autoresizingMask key="autoresizingMask"/>
-                                            <subviews>
-                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Unit of lenght" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ppL-GA-nOz">
-                                                    <rect key="frame" x="15" y="0.0" width="101" height="43"/>
-                                                    <fontDescription key="fontDescription" name="ProximaNova-Regular" family="Proxima Nova" pointSize="17"/>
-                                                    <color key="textColor" red="0.20000000000000001" green="0.20000000000000001" blue="0.20000000000000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                                    <nil key="highlightedColor"/>
-                                                </label>
-                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Meters" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="BAW-8D-VbQ">
-                                                    <rect key="frame" x="533" y="0.0" width="52" height="43"/>
-                                                    <fontDescription key="fontDescription" name="ProximaNova-Regular" family="Proxima Nova" pointSize="17"/>
-                                                    <color key="textColor" red="0.14117647058823529" green="0.53333333333333333" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                                    <nil key="highlightedColor"/>
-                                                </label>
-                                            </subviews>
-                                            <constraints>
-                                                <constraint firstItem="ppL-GA-nOz" firstAttribute="leading" secondItem="AdW-Wh-cdg" secondAttribute="leading" constant="15" id="6h4-D9-5KO"/>
-                                                <constraint firstAttribute="bottom" secondItem="ppL-GA-nOz" secondAttribute="bottom" id="QHh-1W-rlO"/>
-                                                <constraint firstItem="ppL-GA-nOz" firstAttribute="top" secondItem="AdW-Wh-cdg" secondAttribute="top" id="mFk-5F-5Bq"/>
-                                                <constraint firstAttribute="trailing" secondItem="BAW-8D-VbQ" secondAttribute="trailing" constant="15" id="ncF-mW-kDD"/>
-                                                <constraint firstAttribute="bottom" secondItem="BAW-8D-VbQ" secondAttribute="bottom" id="tuC-1Q-z76"/>
-                                                <constraint firstItem="BAW-8D-VbQ" firstAttribute="top" secondItem="AdW-Wh-cdg" secondAttribute="top" id="wbT-o7-qg3"/>
-                                            </constraints>
-                                        </tableViewCellContentView>
-                                    </tableViewCell>
-                                    <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" id="jvx-ht-kSW">
-                                        <autoresizingMask key="autoresizingMask"/>
-                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="jvx-ht-kSW" id="Toz-83-O28">
-                                            <autoresizingMask key="autoresizingMask"/>
-                                            <subviews>
-                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Units of temperature" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="yl7-s8-aoX">
-                                                    <rect key="frame" x="15" y="0.0" width="154" height="43"/>
-                                                    <fontDescription key="fontDescription" name="ProximaNova-Regular" family="Proxima Nova" pointSize="17"/>
-                                                    <color key="textColor" red="0.20000000000000001" green="0.20000000000000001" blue="0.20000000000000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                                    <nil key="highlightedColor"/>
-                                                </label>
-                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Celsius" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="PhJ-Pm-6Zz">
-                                                    <rect key="frame" x="531" y="0.0" width="54" height="43"/>
-                                                    <fontDescription key="fontDescription" name="ProximaNova-Regular" family="Proxima Nova" pointSize="17"/>
-                                                    <color key="textColor" red="0.14117647058823529" green="0.53333333333333333" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                                    <nil key="highlightedColor"/>
-                                                </label>
-                                            </subviews>
-                                            <constraints>
-                                                <constraint firstAttribute="bottom" secondItem="yl7-s8-aoX" secondAttribute="bottom" id="DyD-UG-Ap6"/>
-                                                <constraint firstAttribute="bottom" secondItem="PhJ-Pm-6Zz" secondAttribute="bottom" id="Rgy-68-lbn"/>
-                                                <constraint firstItem="yl7-s8-aoX" firstAttribute="top" secondItem="Toz-83-O28" secondAttribute="top" id="UJT-6C-HYu"/>
-                                                <constraint firstItem="PhJ-Pm-6Zz" firstAttribute="top" secondItem="Toz-83-O28" secondAttribute="top" id="dla-ma-Jxm"/>
-                                                <constraint firstAttribute="trailing" secondItem="PhJ-Pm-6Zz" secondAttribute="trailing" constant="15" id="h0U-6z-gqa"/>
-                                                <constraint firstItem="yl7-s8-aoX" firstAttribute="leading" secondItem="Toz-83-O28" secondAttribute="leading" constant="15" id="sRD-bF-dLi"/>
-                                            </constraints>
-                                        </tableViewCellContentView>
-                                    </tableViewCell>
-                                </cells>
-                            </tableViewSection>
-                        </sections>
+                        <prototypes>
+                            <tableViewCell contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" reuseIdentifier="SettingsHeaderCellIdentifier" rowHeight="30" id="alY-lu-3MX" customClass="SettingsTableViewCell" customModule="strv_test" customModuleProvider="target">
+                                <autoresizingMask key="autoresizingMask"/>
+                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="alY-lu-3MX" id="5KK-nI-nb3">
+                                    <autoresizingMask key="autoresizingMask"/>
+                                    <subviews>
+                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="GENERAL" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="gCv-Ue-tmB">
+                                            <rect key="frame" x="15" y="5" width="62" height="14"/>
+                                            <fontDescription key="fontDescription" name="ProximaNova-Semibold" family="Proxima Nova" pointSize="14"/>
+                                            <color key="textColor" red="0.14117647059999999" green="0.53333333329999999" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                            <nil key="highlightedColor"/>
+                                        </label>
+                                    </subviews>
+                                    <constraints>
+                                        <constraint firstAttribute="trailing" secondItem="gCv-Ue-tmB" secondAttribute="trailing" constant="15" id="TnN-bX-dHM"/>
+                                        <constraint firstItem="gCv-Ue-tmB" firstAttribute="leading" secondItem="5KK-nI-nb3" secondAttribute="leading" constant="15" id="Yjh-et-AWM"/>
+                                        <constraint firstAttribute="bottom" secondItem="gCv-Ue-tmB" secondAttribute="bottom" constant="10" id="Z9Z-Um-Lcv"/>
+                                        <constraint firstItem="gCv-Ue-tmB" firstAttribute="top" secondItem="5KK-nI-nb3" secondAttribute="top" id="vtO-uc-0Xs"/>
+                                    </constraints>
+                                    <variation key="default">
+                                        <mask key="constraints">
+                                            <exclude reference="TnN-bX-dHM"/>
+                                            <exclude reference="vtO-uc-0Xs"/>
+                                        </mask>
+                                    </variation>
+                                </tableViewCellContentView>
+                                <connections>
+                                    <outlet property="unitsLabel" destination="gCv-Ue-tmB" id="slB-Fq-uNq"/>
+                                </connections>
+                            </tableViewCell>
+                            <tableViewCell contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" reuseIdentifier="UnitsLengthCellIdentifier" id="4m9-JX-vjI" customClass="SettingsTableViewCell" customModule="strv_test" customModuleProvider="target">
+                                <autoresizingMask key="autoresizingMask"/>
+                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="4m9-JX-vjI" id="AdW-Wh-cdg">
+                                    <autoresizingMask key="autoresizingMask"/>
+                                    <subviews>
+                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Unit of lenght" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ppL-GA-nOz">
+                                            <rect key="frame" x="15" y="0.0" width="101" height="43"/>
+                                            <fontDescription key="fontDescription" name="ProximaNova-Regular" family="Proxima Nova" pointSize="17"/>
+                                            <color key="textColor" red="0.20000000000000001" green="0.20000000000000001" blue="0.20000000000000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                            <nil key="highlightedColor"/>
+                                        </label>
+                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Meters" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="BAW-8D-VbQ">
+                                            <rect key="frame" x="533" y="0.0" width="52" height="43"/>
+                                            <fontDescription key="fontDescription" name="ProximaNova-Regular" family="Proxima Nova" pointSize="17"/>
+                                            <color key="textColor" red="0.14117647058823529" green="0.53333333333333333" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                            <nil key="highlightedColor"/>
+                                        </label>
+                                    </subviews>
+                                    <constraints>
+                                        <constraint firstItem="ppL-GA-nOz" firstAttribute="leading" secondItem="AdW-Wh-cdg" secondAttribute="leading" constant="15" id="6h4-D9-5KO"/>
+                                        <constraint firstAttribute="bottom" secondItem="ppL-GA-nOz" secondAttribute="bottom" id="QHh-1W-rlO"/>
+                                        <constraint firstItem="ppL-GA-nOz" firstAttribute="top" secondItem="AdW-Wh-cdg" secondAttribute="top" id="mFk-5F-5Bq"/>
+                                        <constraint firstAttribute="trailing" secondItem="BAW-8D-VbQ" secondAttribute="trailing" constant="15" id="ncF-mW-kDD"/>
+                                        <constraint firstAttribute="bottom" secondItem="BAW-8D-VbQ" secondAttribute="bottom" id="tuC-1Q-z76"/>
+                                        <constraint firstItem="BAW-8D-VbQ" firstAttribute="top" secondItem="AdW-Wh-cdg" secondAttribute="top" id="wbT-o7-qg3"/>
+                                    </constraints>
+                                </tableViewCellContentView>
+                                <connections>
+                                    <outlet property="titleLabel" destination="ppL-GA-nOz" id="LZ3-Dz-fEs"/>
+                                    <outlet property="unitsLabel" destination="BAW-8D-VbQ" id="T8w-ra-7HP"/>
+                                </connections>
+                            </tableViewCell>
+                            <tableViewCell contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" reuseIdentifier="UnitsTemperatureCellIdentifier" id="jvx-ht-kSW" customClass="SettingsTableViewCell" customModule="strv_test" customModuleProvider="target">
+                                <autoresizingMask key="autoresizingMask"/>
+                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="jvx-ht-kSW" id="Toz-83-O28">
+                                    <autoresizingMask key="autoresizingMask"/>
+                                    <subviews>
+                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Units of temperature" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="yl7-s8-aoX">
+                                            <rect key="frame" x="15" y="0.0" width="154" height="43"/>
+                                            <fontDescription key="fontDescription" name="ProximaNova-Regular" family="Proxima Nova" pointSize="17"/>
+                                            <color key="textColor" red="0.20000000000000001" green="0.20000000000000001" blue="0.20000000000000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                            <nil key="highlightedColor"/>
+                                        </label>
+                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Celsius" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="PhJ-Pm-6Zz">
+                                            <rect key="frame" x="531" y="0.0" width="54" height="43"/>
+                                            <fontDescription key="fontDescription" name="ProximaNova-Regular" family="Proxima Nova" pointSize="17"/>
+                                            <color key="textColor" red="0.14117647058823529" green="0.53333333333333333" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                            <nil key="highlightedColor"/>
+                                        </label>
+                                    </subviews>
+                                    <constraints>
+                                        <constraint firstAttribute="bottom" secondItem="yl7-s8-aoX" secondAttribute="bottom" id="DyD-UG-Ap6"/>
+                                        <constraint firstAttribute="bottom" secondItem="PhJ-Pm-6Zz" secondAttribute="bottom" id="Rgy-68-lbn"/>
+                                        <constraint firstItem="yl7-s8-aoX" firstAttribute="top" secondItem="Toz-83-O28" secondAttribute="top" id="UJT-6C-HYu"/>
+                                        <constraint firstItem="PhJ-Pm-6Zz" firstAttribute="top" secondItem="Toz-83-O28" secondAttribute="top" id="dla-ma-Jxm"/>
+                                        <constraint firstAttribute="trailing" secondItem="PhJ-Pm-6Zz" secondAttribute="trailing" constant="15" id="h0U-6z-gqa"/>
+                                        <constraint firstItem="yl7-s8-aoX" firstAttribute="leading" secondItem="Toz-83-O28" secondAttribute="leading" constant="15" id="sRD-bF-dLi"/>
+                                    </constraints>
+                                </tableViewCellContentView>
+                                <connections>
+                                    <outlet property="titleLabel" destination="yl7-s8-aoX" id="thu-Bo-D7b"/>
+                                    <outlet property="unitsLabel" destination="PhJ-Pm-6Zz" id="6lr-0w-qoj"/>
+                                </connections>
+                            </tableViewCell>
+                        </prototypes>
+                        <sections/>
                         <connections>
-                            <outlet property="dataSource" destination="dvu-X3-GKw" id="oF0-Ql-Tzy"/>
-                            <outlet property="delegate" destination="dvu-X3-GKw" id="V4F-8h-oOb"/>
+                            <outlet property="dataSource" destination="dvu-X3-GKw" id="bRt-xx-Nqs"/>
+                            <outlet property="delegate" destination="dvu-X3-GKw" id="cSn-BD-eF1"/>
                         </connections>
                     </tableView>
                     <navigationItem key="navigationItem" title="Settings" id="6nz-oW-YZv"/>

@@ -27,8 +27,10 @@ class TodayViewController: UIViewController, LocationManagerDelegate, NSFetchedR
     lazy var fetchedResultsController: NSFetchedResultsController = {
         let fetchRequest = NSFetchRequest(entityName: "Forecast");
         
-        let predicate: NSPredicate = NSPredicate(format: "city.list.located = %@", NSNumber(bool: true));
-        fetchRequest.predicate = predicate;
+        let cityPredicate: NSPredicate = NSPredicate(format: "city.list.located = %@", NSNumber(bool: true));
+        let currentPredicate: NSPredicate = NSPredicate(format: "current = %@", NSNumber(bool: true));
+        let compoundPredicate: NSPredicate = NSCompoundPredicate.andPredicateWithSubpredicates([cityPredicate, currentPredicate]);
+        fetchRequest.predicate = compoundPredicate;
         
         let primarySortDescriptor = NSSortDescriptor(key: "date", ascending: false);
         fetchRequest.sortDescriptors = [primarySortDescriptor];
@@ -60,6 +62,12 @@ class TodayViewController: UIViewController, LocationManagerDelegate, NSFetchedR
         self.setNeedsStatusBarAppearanceUpdate();
     }
     
+    override func viewWillAppear(animated: Bool) {
+        super.viewWillAppear(animated);
+        
+        self.reloadData();
+    }
+    
     override func viewDidAppear(animated: Bool) {
         super.viewDidAppear(animated);
         
@@ -84,16 +92,16 @@ class TodayViewController: UIViewController, LocationManagerDelegate, NSFetchedR
     //  MARK: - Delegate
     //  MARK: LocationManager
     func locationManager(locationManager: LocationManager, loadLocation: CLLocation) {
-        LoaderManager.sharedInstance.loadCurrentLocatedWeatherWithPosition(loadLocation.coordinate.latitude, longitude: loadLocation.coordinate.longitude, successHandler: { (request, response, success) -> Void in
+        LoaderManager.sharedInstance.loadCurrentWeatherWithPosition(loadLocation.coordinate.latitude, longitude: loadLocation.coordinate.longitude, located: true, successHandler: { (request, response, success) -> Void in
             
             }) { (error) -> Void in
                 println("Error \(error)");
-        }
+        };
         LoaderManager.sharedInstance.loadForecastWeatherWithPosition(loadLocation.coordinate.latitude, longitude: loadLocation.coordinate.longitude, successHandler: { (request, response, success) -> Void in
             
             }) { (error) -> Void in
                 println("Error \(error)");
-        }
+        };
         
         locationManager.stopLocating();
     }
@@ -122,18 +130,23 @@ class TodayViewController: UIViewController, LocationManagerDelegate, NSFetchedR
             return false;
         }
         if let forecast: CDForecast = forecasts!.first as? CDForecast {
-            self.locationLabel?.text = String(format: "%@, %@", forecast.city.name, forecast.city.country);
+            self.locationImageView?.hidden = !forecast.city.list.located.boolValue;
+            self.locationLabel?.text = forecast.city.nameWithCountry();
             
             if let weatherImage = forecast.weatherStateImageName() {
                 self.weatherImageView?.image = UIImage(named: weatherImage + "_Big");
             }
             
-            self.temperatureLabel?.text = String(format: "%.1f °", forecast.temperature.doubleValue - 273.15);
+            if let temperature: String = forecast.temperatureString(1) {
+                self.temperatureLabel?.text = temperature;
+            }
             self.weatherLabel?.text = forecast.weatherState;
             self.humidityLabel?.text = String(format: "%.1f %%", forecast.humidity.doubleValue);
             self.rainLabel?.text = String(format: "%.1f mm", forecast.precipitation.doubleValue);
             self.pressureLabel?.text = String(format: "%.1f hPa", forecast.pressure.doubleValue);
-            self.windSpeedLabel?.text = String(format: "%.1f km/h", forecast.windSpeed.doubleValue * 3.6);
+            if let windSpeed: String = forecast.windSpeedString(1) {
+                self.windSpeedLabel?.text = windSpeed;
+            }
             self.windDirectionLabel?.text = forecast.windDirectionString();
         }
     }

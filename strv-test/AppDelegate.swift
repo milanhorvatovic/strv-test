@@ -45,13 +45,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         LocationManager.sharedInstance;
         DatabaseManager.sharedInstance;
         
-//        if (NSUserDefaults.standardUserDefaults().boolForKey(_kUserDefaultsKeyImportCityList) == false) {
-//            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), { () -> Void in
-//                LoaderManager.sharedInstance.parseCityList();
-//                NSUserDefaults.standardUserDefaults().setBool(true, forKey: _kUserDefaultsKeyImportCityList);
-//            });
-//        }
-        
         return true;
     }
 

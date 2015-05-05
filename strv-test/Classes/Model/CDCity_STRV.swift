@@ -10,6 +10,14 @@ import Foundation
 
 extension CDCity {
     
+    func nameWithCountry() -> String {
+        var location: String = self.name;
+        if let country = self.country {
+            location += ", " + country;
+        }
+        return location;
+    }
+    
     override func willChangeValueForKey(key: String) {
         super.willChangeValueForKey(key);
         

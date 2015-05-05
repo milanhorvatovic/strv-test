@@ -8,6 +8,11 @@
 
 import Foundation
 
+enum CDForecastUnits : Int {
+    case Metrics
+    case Imerial
+}
+
 extension CDForecast {
     
     func weatherStateImageName() -> String? {
@@ -27,6 +32,40 @@ extension CDForecast {
             }
         }
         return nil;
+    }
+    
+    func temperatureString(precision: Int) -> String? {
+        let format: String = String(format: "%%.%df", precision);
+        
+        var units: CDForecastUnits? = CDForecastUnits(rawValue: NSUserDefaults.standardUserDefaults().integerForKey("TEMPERATURE_UNITS"));
+        if (units == nil) {
+            units = CDForecastUnits.Metrics;
+        }
+        switch units! {
+        case .Metrics:
+            return String(format: String(format: "%@ °C", format), self.temperature.doubleValue - 273.15);
+        case .Imerial:
+            return String(format: String(format: "%@ °F", format), (self.temperature.doubleValue - 273.15) * 1.8000 + 32.00);
+        default:
+            return nil;
+        }
+    }
+    
+    func windSpeedString(precision: Int) -> String? {
+        let format: String = String(format: "%%.%df", precision);
+        
+        var units: CDForecastUnits? = CDForecastUnits(rawValue: NSUserDefaults.standardUserDefaults().integerForKey("LENGTH_UNITS"));
+        if (units == nil) {
+            units = CDForecastUnits.Metrics;
+        }
+        switch units! {
+        case .Metrics:
+            return String(format: String(format: "%@ km/h", format), self.windSpeed.doubleValue * 3.6);
+        case .Imerial:
+            return String(format: String(format: "%@ mph", format), self.windSpeed.doubleValue * 2.23694);
+        default:
+            return nil;
+        }
     }
     
     func windDirectionString() -> String? {

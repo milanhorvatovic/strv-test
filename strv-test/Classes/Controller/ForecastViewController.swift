@@ -20,8 +20,10 @@ class ForecastViewController: UIViewController, UITableViewDelegate, UITableView
         
         let currentDate: NSDate = NSDate();
         let locatedPredicate: NSPredicate = NSPredicate(format: "city.list.located = %@", NSNumber(bool: true));
+        let identifierPredicate: NSPredicate = NSPredicate(format: "identifier > %@", NSNumber(int: 0));
+        let currentPredicate: NSPredicate = NSPredicate(format: "current = %@", NSNumber(bool: false));
         let datePredicate: NSPredicate = NSPredicate(format: "date >= %@", NSDate(timeIntervalSince1970: currentDate.timeIntervalSince1970 - (currentDate.timeIntervalSince1970 % 86400)));
-        let compoundPredicate: NSPredicate = NSCompoundPredicate.andPredicateWithSubpredicates([locatedPredicate, datePredicate]);
+        let compoundPredicate: NSPredicate = NSCompoundPredicate.andPredicateWithSubpredicates([locatedPredicate, identifierPredicate, currentPredicate, datePredicate]);
         fetchRequest.predicate = compoundPredicate;
         
         let primarySortDescriptor = NSSortDescriptor(key: "date", ascending: true);
@@ -53,13 +55,25 @@ class ForecastViewController: UIViewController, UITableViewDelegate, UITableView
         }
         self.tableView?.reloadData();
         
-        let indexPath: NSIndexPath = NSIndexPath(forRow: 0, inSection: 0);
-        if let forecast: CDForecast = self.fetchedResultsController.objectAtIndexPath(indexPath) as? CDForecast {
-            var city: CDCity? = forecast.city;
-            if (city != nil) {
-                self.navigationItem.title = String(format: "%@, %@", city!.name, city!.country);
+        if (self.tableView != nil && self.tableView(self.tableView!, numberOfRowsInSection: 0) > 0) {
+            let indexPath: NSIndexPath = NSIndexPath(forRow: 0, inSection: 0);
+            if let forecast: CDForecast = self.fetchedResultsController.objectAtIndexPath(indexPath) as? CDForecast {
+                var city: CDCity? = forecast.city;
+                if (city != nil) {
+                    self.navigationItem.title = city?.nameWithCountry();
+                }
             }
         }
+    }
+    
+    override func viewWillAppear(animated: Bool) {
+        super.viewWillAppear(animated);
+        
+        if (self.navigationItem.title == nil) {
+            self.navigationItem.title = "Forecast";
+        }
+        
+        self.tableView?.reloadData();
     }
 
     override func didReceiveMemoryWarning() {
@@ -197,7 +211,9 @@ class ForecastViewController: UIViewController, UITableViewDelegate, UITableView
             if let weatherImage = forecast.weatherStateImageName() {
                 cell.weatherImageView?.image = UIImage(named: weatherImage);
             }
-            cell.temperatureLabel?.text = String(format: "%.1f °", forecast.temperature.doubleValue - 273.15);
+            if let temperature: String = forecast.temperatureString(1) {
+                cell.temperatureLabel?.text = temperature;
+            }
             cell.weatherConditionLabel?.text = forecast.weatherState;
             
             let dateFormater: NSDateFormatter = NSDateFormatter();

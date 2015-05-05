@@ -14,6 +14,8 @@ import Alamofire;
 
 class LoaderManager: NSObject {
     
+    private let backgroundQueue = dispatch_queue_create(nil, DISPATCH_QUEUE_SERIAL);
+    
     class var sharedInstance: LoaderManager {
         struct Static {
             static var onceToken: dispatch_once_t = 0;
@@ -25,28 +27,29 @@ class LoaderManager: NSObject {
         return Static.instance!
     }
     
-    func loadCurrentLocatedWeatherWithPosition(latitude: CLLocationDegrees, longitude: CLLocationDegrees, successHandler:(request: NSURLRequest, response: NSHTTPURLResponse?, success:NSDictionary?) -> Void, failuerHandler:(error: NSError) -> Void) -> Bool {
+    func loadCurrentWeatherWithPosition(latitude: CLLocationDegrees, longitude: CLLocationDegrees, located: Bool, successHandler:(request: NSURLRequest, response: NSHTTPURLResponse?, success:NSDictionary?) -> Void, failuerHandler:(error: NSError) -> Void) -> Bool {
         let URL:String = String(format: "http://api.openweathermap.org/data/2.5/weather?lat=%f&lon=%f&APPID=c5ad4da2f35d924ebf97b74e3e03b511", latitude, longitude);
         Alamofire.request(Alamofire.Method.GET, URL.URLString).responseJSON() {
             (request, response, JSON, error) in
             
             if (error == nil) {
-                dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), { () -> Void in
+                dispatch_async(self.backgroundQueue, { () -> Void in
                     if let successResponse: NSDictionary = JSON as? NSDictionary {
                         if let dateTime: NSNumber = successResponse["dt"] as? NSNumber {
                             var date: NSDate = NSDate(timeIntervalSince1970: dateTime.doubleValue);
                             
-                            let cityId: AnyObject? = successResponse["id"];
-                            let cityName: AnyObject? = successResponse["name"];
-                            //                        println("ID: \(cityId), Name: \(cityName), Date \(date)");
+                            let cityId: NSNumber? = successResponse["id"] as? NSNumber;
+                            let cityName: String? = successResponse["name"] as? String;
+//                            println("ID: \(cityId), Name: \(cityName), Date \(date)");
                             
                             if let context: NSManagedObjectContext? = DatabaseManager.sharedInstance.createDatabaseContext() {
                                 var todayForecast: CDForecast?;
                                 
                                 var fetchRequest: NSFetchRequest = NSFetchRequest(entityName: "Forecast");
-                                let datePredicate: NSPredicate = NSPredicate(format: "date = %@", date);
-                                var cityPredicate: NSPredicate = NSPredicate(format: "city.identifier = %@", successResponse["id"] as! NSNumber);
-                                let compoundPredicate: NSPredicate = NSCompoundPredicate.andPredicateWithSubpredicates([datePredicate, cityPredicate]);
+                                
+                                let currentPredicate: NSPredicate = NSPredicate(format: "current = %@", NSNumber(bool: true));
+                                var cityPredicate: NSPredicate = NSPredicate(format: "city.identifier = %@", cityId!);
+                                let compoundPredicate: NSPredicate = NSCompoundPredicate.andPredicateWithSubpredicates([currentPredicate, cityPredicate]);
                                 fetchRequest.predicate = compoundPredicate;
                                 
                                 var error: NSError?;
@@ -62,6 +65,7 @@ class LoaderManager: NSObject {
                                 if (todayForecast == nil) {
                                     todayForecast = NSEntityDescription.insertNewObjectForEntityForName("Forecast", inManagedObjectContext: context!) as? CDForecast;
                                     todayForecast?.date = date;
+                                    todayForecast?.current = NSNumber(bool: true);
                                 }
                                 if let temperature: NSNumber = successResponse["main"]?["temp"] as? NSNumber {
                                     todayForecast?.temperature = temperature;
@@ -99,8 +103,10 @@ class LoaderManager: NSObject {
                                 cityPredicate = NSPredicate(format: "identifier = %@", successResponse["id"] as! NSNumber);
                                 fetchRequest.predicate = cityPredicate;
                                 
+                                var city: CDCity?;
+                                var list: CDList?;
                                 if let cityArray = context?.executeFetchRequest(fetchRequest, error: &error) {
-                                    if (cityArray.count > 0) {
+                                    if (located == true) {
                                         fetchRequest = NSFetchRequest(entityName: "List");
                                         let listPredicate: NSPredicate = NSPredicate(format: "located = %@", NSNumber(bool: true));
                                         fetchRequest.predicate = listPredicate;
@@ -110,16 +116,48 @@ class LoaderManager: NSObject {
                                                 listObject.located = NSNumber(bool: false);
                                             }
                                         }
-                                        
-                                        var city: CDCity = cityArray.first as! CDCity;
-                                        var list: CDList? = city.list;
-                                        if (list == nil) {
-                                            list = NSEntityDescription.insertNewObjectForEntityForName("List", inManagedObjectContext: context!) as? CDList;
-                                            list?.city = city;
+                                    }
+                                    
+                                    if (cityArray.count > 0) {
+                                        city = cityArray.first as? CDCity;
+                                    }
+                                    
+                                    if (city == nil) {
+                                        city = NSEntityDescription.insertNewObjectForEntityForName("City", inManagedObjectContext: context!) as? CDCity;
+                                    }
+                                    
+                                    if (city != nil) {
+                                        if let cityId: NSNumber = cityId {
+                                            city?.identifier = cityId;
                                         }
-                                        list!.located = NSNumber(bool: true);
+                                        if let cityName: String = cityName {
+                                            city?.name = cityName;
+                                        }
+                                        if let coordinates: NSDictionary = successResponse["coord"] as? NSDictionary {
+                                            if let latitude: NSNumber = coordinates["lat"] as? NSNumber {
+                                                city?.locationLatitude = latitude;
+                                            }
+                                            if let longitude: NSNumber = coordinates["lon"] as? NSNumber {
+                                                city?.locationLongitude = longitude;
+                                            }
+                                        }
                                         
-                                        todayForecast?.city = city;
+                                        if let listLet: CDList = city?.list {
+                                            list = listLet;
+                                        }
+                                        else {
+                                            list = NSEntityDescription.insertNewObjectForEntityForName("List", inManagedObjectContext: context!) as? CDList;
+                                        }
+                                        
+                                        if (list != nil) {
+                                            list?.city = city!;
+                                            
+                                            if (located == true) {
+                                                list!.located = NSNumber(bool: located);
+                                            }
+                                        }
+                                        
+                                        todayForecast?.city = city!;
                                     }
                                 }
                                 if (error != nil) {
@@ -142,28 +180,29 @@ class LoaderManager: NSObject {
         return false;
     }
     
-    func loadCurrentWeatherWithPosition(latitude: CLLocationDegrees, longitude: CLLocationDegrees, successHandler:(request: NSURLRequest, response: NSHTTPURLResponse?, success:NSDictionary?) -> Void, failuerHandler:(error: NSError) -> Void) -> Bool {
-        let URL:String = String(format: "http://api.openweathermap.org/data/2.5/weather?lat=%f&lon=%f&APPID=c5ad4da2f35d924ebf97b74e3e03b511", latitude, longitude);
+    func loadCurrentWeatherWithId(cityId: Int, successHandler:(request: NSURLRequest, response: NSHTTPURLResponse?, success:NSDictionary?) -> Void, failuerHandler:(error: NSError) -> Void) -> Bool {
+        let URL:String = String(format: "http://api.openweathermap.org/data/2.5/weather?id=%d&APPID=c5ad4da2f35d924ebf97b74e3e03b511", cityId);
         Alamofire.request(Alamofire.Method.GET, URL.URLString).responseJSON() {
             (request, response, JSON, error) in
             
             if (error == nil) {
-                dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), { () -> Void in
+                dispatch_async(self.backgroundQueue, { () -> Void in
                     if let successResponse: NSDictionary = JSON as? NSDictionary {
                         if let dateTime: NSNumber = successResponse["dt"] as? NSNumber {
                             var date: NSDate = NSDate(timeIntervalSince1970: dateTime.doubleValue);
                             
-                            let cityId: AnyObject? = successResponse["id"];
-                            let cityName: AnyObject? = successResponse["name"];
-                            //                        println("ID: \(cityId), Name: \(cityName), Date \(date)");
+                            let cityId: NSNumber? = successResponse["id"] as? NSNumber;
+                            let cityName: String? = successResponse["name"] as? String;
+                            //                            println("ID: \(cityId), Name: \(cityName), Date \(date)");
                             
                             if let context: NSManagedObjectContext? = DatabaseManager.sharedInstance.createDatabaseContext() {
                                 var todayForecast: CDForecast?;
                                 
                                 var fetchRequest: NSFetchRequest = NSFetchRequest(entityName: "Forecast");
-                                let datePredicate: NSPredicate = NSPredicate(format: "date = %@", date);
-                                var cityPredicate: NSPredicate = NSPredicate(format: "city.identifier = %@", successResponse["id"] as! NSNumber);
-                                let compoundPredicate: NSPredicate = NSCompoundPredicate.andPredicateWithSubpredicates([datePredicate, cityPredicate]);
+                                
+                                let currentPredicate: NSPredicate = NSPredicate(format: "current = %@", NSNumber(bool: true));
+                                var cityPredicate: NSPredicate = NSPredicate(format: "city.identifier = %@", cityId!);
+                                let compoundPredicate: NSPredicate = NSCompoundPredicate.andPredicateWithSubpredicates([currentPredicate, cityPredicate]);
                                 fetchRequest.predicate = compoundPredicate;
                                 
                                 var error: NSError?;
@@ -179,6 +218,7 @@ class LoaderManager: NSObject {
                                 if (todayForecast == nil) {
                                     todayForecast = NSEntityDescription.insertNewObjectForEntityForName("Forecast", inManagedObjectContext: context!) as? CDForecast;
                                     todayForecast?.date = date;
+                                    todayForecast?.current = NSNumber(bool: true);
                                 }
                                 if let temperature: NSNumber = successResponse["main"]?["temp"] as? NSNumber {
                                     todayForecast?.temperature = temperature;
@@ -216,16 +256,45 @@ class LoaderManager: NSObject {
                                 cityPredicate = NSPredicate(format: "identifier = %@", successResponse["id"] as! NSNumber);
                                 fetchRequest.predicate = cityPredicate;
                                 
+                                var city: CDCity?;
+                                var list: CDList?;
                                 if let cityArray = context?.executeFetchRequest(fetchRequest, error: &error) {
                                     if (cityArray.count > 0) {
-                                        var city: CDCity = cityArray.first as! CDCity;
-                                        var list: CDList? = city.list;
-                                        if (list == nil) {
-                                            list = NSEntityDescription.insertNewObjectForEntityForName("List", inManagedObjectContext: context!) as? CDList;
-                                            list?.city = city;
+                                        city = cityArray.first as? CDCity;
+                                    }
+                                    
+                                    if (city == nil) {
+                                        city = NSEntityDescription.insertNewObjectForEntityForName("City", inManagedObjectContext: context!) as? CDCity;
+                                    }
+                                    
+                                    if (city != nil) {
+                                        if let cityId: NSNumber = cityId {
+                                            city?.identifier = cityId;
+                                        }
+                                        if let cityName: String = cityName {
+                                            city?.name = cityName;
+                                        }
+                                        if let coordinates: NSDictionary = successResponse["coord"] as? NSDictionary {
+                                            if let latitude: NSNumber = coordinates["lat"] as? NSNumber {
+                                                city?.locationLatitude = latitude;
+                                            }
+                                            if let longitude: NSNumber = coordinates["lon"] as? NSNumber {
+                                                city?.locationLongitude = longitude;
+                                            }
                                         }
                                         
-                                        todayForecast?.city = city;
+                                        if let listLet: CDList = city?.list {
+                                            list = listLet;
+                                        }
+                                        else {
+                                            list = NSEntityDescription.insertNewObjectForEntityForName("List", inManagedObjectContext: context!) as? CDList;
+                                        }
+                                        
+                                        if (list != nil) {
+                                            list?.city = city!;
+                                        }
+                                        
+                                        todayForecast?.city = city!;
                                     }
                                 }
                                 if (error != nil) {
@@ -249,15 +318,15 @@ class LoaderManager: NSObject {
     }
     
     func loadForecastWeatherWithPosition(latitude: CLLocationDegrees, longitude: CLLocationDegrees, successHandler:(request: NSURLRequest, response: NSHTTPURLResponse?, success:NSDictionary?) -> Void, failuerHandler:(error: NSError) -> Void) -> Bool {
-        let URL: String = String(format: "http://api.openweathermap.org/data/2.5/forecast/daily?lat=%f&lon=%f&cnt=5&APPID=c5ad4da2f35d924ebf97b74e3e03b511&mode=json", latitude, longitude);
+        let URL: String = String(format: "http://api.openweathermap.org/data/2.5/forecast/daily?lat=%f&lon=%f&cnt=7&APPID=c5ad4da2f35d924ebf97b74e3e03b511&mode=json", latitude, longitude);
         Alamofire.request(Alamofire.Method.GET, URL.URLString).responseJSON() {
             (request, response, JSON, error) in
             
             if (error == nil) {
-                dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), { () -> Void in
+                dispatch_async(self.backgroundQueue, { () -> Void in
                     if let successResponse: NSDictionary = JSON as? NSDictionary {
-                        let cityId: AnyObject? = successResponse["city"]?["id"];
-                        let cityName: AnyObject? = successResponse["city"]?["name"];
+                        let cityId: NSNumber? = successResponse["city"]?["id"] as? NSNumber;
+                        let cityName: String? = successResponse["city"]?["name"] as? String;
                         //                    println("ID: \(cityId), Name: \(cityName)");
                         
                         if let cityJSON: NSDictionary = successResponse["city"] as? NSDictionary {
@@ -275,9 +344,29 @@ class LoaderManager: NSObject {
                                         if (cityArray.count > 0) {
                                             city = cityArray.first as? CDCity;
                                         }
+                                        
+                                        if (city == nil) {
+                                            city = NSEntityDescription.insertNewObjectForEntityForName("City", inManagedObjectContext: context!) as? CDCity;
+                                        }
                                     }
                                     
                                     if (city != nil) {
+                                        city?.identifier = cityId;
+                                        if let cityName: String = cityName {
+                                            city?.name = cityName;
+                                        }
+                                        if let coordinates: NSDictionary = successResponse["coord"] as? NSDictionary {
+                                            if let latitude: NSNumber = coordinates["lat"] as? NSNumber {
+                                                city?.locationLatitude = latitude;
+                                            }
+                                            if let longitude: NSNumber = coordinates["lon"] as? NSNumber {
+                                                city?.locationLongitude = longitude;
+                                            }
+                                        }
+                                        if let country: String = successResponse["country"] as? String {
+                                            city?.country = country;
+                                        }
+                                        
                                         if let forecastArray: NSArray = successResponse["list"] as? NSArray {
                                             for forecastItem in forecastArray {
                                                 if let forecastJSON: NSDictionary = forecastItem as? NSDictionary {
@@ -286,10 +375,14 @@ class LoaderManager: NSObject {
                                                         
                                                         var forecast: CDForecast?;
                                                         
+                                                        let identifier: NSNumber = NSNumber(integer: Int(date.timeIntervalSince1970 - (date.timeIntervalSince1970 % 86400)));
+//                                                        println("date: \(date), date.timestamp: \(date.timeIntervalSince1970), identifier: \(identifier)");
+                                                        
                                                         var fetchRequest: NSFetchRequest = NSFetchRequest(entityName: "Forecast");
-                                                        let datePredicate: NSPredicate = NSPredicate(format: "date = %@", date);
+                                                        let identifierPredicate: NSPredicate = NSPredicate(format: "identifier = %@", identifier);
+                                                        let currentPredicate: NSPredicate = NSPredicate(format: "current = %@", NSNumber(bool: false));
                                                         let cityPredicate: NSPredicate = NSPredicate(format: "city.identifier = %@", cityId);
-                                                        let compoundPredicate: NSPredicate = NSCompoundPredicate.andPredicateWithSubpredicates([datePredicate, cityPredicate]);
+                                                        let compoundPredicate: NSPredicate = NSCompoundPredicate.andPredicateWithSubpredicates([identifierPredicate, currentPredicate, cityPredicate]);
                                                         fetchRequest.predicate = compoundPredicate;
                                                         
                                                         var error: NSError?;
@@ -304,8 +397,9 @@ class LoaderManager: NSObject {
                                                         
                                                         if (forecast == nil) {
                                                             forecast = NSEntityDescription.insertNewObjectForEntityForName("Forecast", inManagedObjectContext: context!) as? CDForecast;
-                                                            forecast?.date = date;
                                                         }
+                                                        forecast?.identifier = identifier;
+                                                        forecast?.date = date;
                                                         if let temperature: NSNumber = forecastJSON["temp"]?["day"] as? NSNumber {
                                                             forecast?.temperature = temperature;
                                                         }
@@ -352,40 +446,18 @@ class LoaderManager: NSObject {
         return false;
     }
     
-    func parseCityList() -> Void {
-        if let path:String = NSBundle.mainBundle().pathForResource("city-list", ofType: "json") {
-            autoreleasepool {
-                let jsonData = NSData(contentsOfFile:path, options: .DataReadingMappedIfSafe, error: nil);
-                var jsonResult: NSArray = NSJSONSerialization.JSONObjectWithData(jsonData!, options: NSJSONReadingOptions.MutableContainers, error: nil) as! NSArray;
-                let context = DatabaseManager.sharedInstance.createDatabaseContext()!
-                
-                var index:Int = 0;
-                for city in jsonResult {
-                    autoreleasepool {
-                        let cityName: NSString = city["name"] as! NSString;
-                        let cityCountry: NSString = city["country"] as! NSString;
-                        if (cityName.length > 0 && cityCountry.length > 0) {
-//                            println("index \(index): \(cityName)");
-                            let cityMO: AnyObject = NSEntityDescription.insertNewObjectForEntityForName("City", inManagedObjectContext: context);
-                            cityMO.setValue(city["_id"], forKey: "identifier");
-                            cityMO.setValue(cityName, forKey: "name");
-                            cityMO.setValue(city["country"], forKey: "country");
-                            cityMO.setValue((city["coord"] as! Dictionary)["lat"], forKey: "locationLatitude");
-                            cityMO.setValue((city["coord"] as! Dictionary)["lon"], forKey: "locationLongitude");
-                            var normalized = NSMutableString(string: cityName) as CFMutableString;
-                            CFStringNormalize(normalized, CFStringNormalizationForm.D);
-                            CFStringFold(normalized, CFStringCompareFlags.CompareCaseInsensitive | CFStringCompareFlags.CompareDiacriticInsensitive | CFStringCompareFlags.CompareWidthInsensitive, nil);
-                            cityMO.setValue(normalized, forKey: "search");
-                            DatabaseManager.sharedInstance.checkSaveDatabaseContext(context, limit: 10000);
-//                            context.reset();
-                            index++;
-                        }
-                    }
-                }
-                
-                DatabaseManager.sharedInstance.saveDatabaseContext(context);
+    func findCityWithName(name: String, successHandler:(request: NSURLRequest, response: NSHTTPURLResponse?, success:NSDictionary?) -> Void, failuerHandler:(error: NSError) -> Void) -> Bool {
+        let URL: String = String(format: "http://api.openweathermap.org/data/2.5/find?q=%@&type=like&APPID=c5ad4da2f35d924ebf97b74e3e03b511&mode=json", name);
+        Alamofire.request(Alamofire.Method.GET, URL.URLString).responseJSON() {
+            (request, response, JSON, error) in
+            if (error == nil) {
+                successHandler(request: request, response: response, success: JSON as? NSDictionary);
             }
-        }
+            else {
+                failuerHandler(error: error!);
+            }
+        };
+        return false;
     }
     
 }
